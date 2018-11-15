@@ -1,0 +1,100 @@
+type program2
+
+% program2.m
+% 
+% Author: Jerome Anaeki
+% Account: janaeki1
+% CSc 4630/6630 Program #2
+% Due Date: 10/9/18
+%
+% Description:
+% This program imports data from a file, corrects bad values, compares
+% measured and target temperatures using a threshold from user input,
+% and plots an array of the measured and target temperatures vs elapsed times.
+%
+% Input:
+% The program input is the threshold amount.
+%
+% Output:
+% The program outputs are the number of bad values that are fixed, the 
+% number of times the measured temperature matches the target temperature
+% within the tolerance amount, graph of measured temperature vs. elapsed
+% time, and graph of target temperature vs. elapsed time.
+% 
+% Usage:
+% program2
+
+
+load('temperatureData.mat'); % opens file and imports data
+
+firstVal = 1; % index for first value
+secondVal = 2; % index for second value
+badValueCount = 0; % count for bad values
+correctedVal = 0; % array for corrected values
+for x = 1:length(tempData)-1 % executes for every entry
+    if tempData(firstVal, 2) ~= tempData(secondVal, 2) % compares equality of first and second values
+        badValueCount = badValueCount + 1; % increments bad value count
+        % calculates the mean of two values and stores them in array
+        correctedVal(badValueCount) = mean(tempData(firstVal:secondVal, 2));
+    end
+    firstVal = firstVal + 1; % increments first value index
+	secondVal = secondVal + 1; % increments second value index
+end
+
+% displays number of bad values that were fixed
+disp(sprintf("%d bad values were fixed.", badValueCount));
+disp(" ");
+
+
+threshold = input('Please enter a threshold: '); % asks user input for acceptable variance
+disp(" ");
+
+acceptCount = 0; % count for accepted values
+acceptVal = 0; % array for accepted values
+for x = 1:length(tempData) % executes for every entry
+    % compares the difference of measured and target temperatures with the given threshold
+    if (abs(tempData(x, 2) - tempData(x, 3)) < threshold)
+        acceptCount = acceptCount +  1; % count is incremented when variance is acceptable
+        acceptVal(acceptCount) = tempData(x, 2); % stores accepted values in array
+    end
+end
+
+disp("Accepted Temperature Information:");
+disp(sprintf("# of matches: %d", acceptCount)); % displays # of matches
+disp(sprintf("# of entries: %d", length(tempData))); % displays # of entries
+disp(sprintf("Percentage of matches: %.2f%%", acceptCount/length(tempData)*100)); % displays percentage of matches
+disp(sprintf("Tolerance amount: %d", threshold)); % displays tolerance amount
+disp(" ");
+
+
+elapsedTime = 0.05:0.05:89.05; % array of elapsed time (in minutes)
+measuredTemp = 0; % array of measured temperatures
+targetTemp = 0; % array of target temperatures
+for x = 1:length(tempData) % executes for every entry
+    measuredTemp(x) = tempData(x, 2); % stores measured temperatures in array
+    targetTemp(x) = tempData(x, 3); % stores target temperatures in array
+end
+
+% Plots measured temperatures in blue
+plot(elapsedTime, measuredTemp, 'b'); % plots graph in blue
+xlabel('Elapsed Time (in minutes)'); % labels x-axis
+ylabel('Measured Temperatures'); % labels y-axis
+title('Measured Temperatures vs Elapsed Time'); % gives title to graph
+
+% Plots target temperatures in red
+plot(elapsedTime, targetTemp, 'r'); % plots graph in red
+xlabel('Elapsed Time (in minutes)'); % labels x-axis
+ylabel('Target Temperatures'); % labels y-axis
+title('Target Temperatures vs Elapsed Time'); % gives title to graph
+program2
+489 bad values were fixed.
+ 
+Please enter a threshold: 7
+ 
+Accepted Temperature Information:
+# of matches: 1595
+# of entries: 1781
+Percentage of matches: 89.56%
+Tolerance amount: 7
+ 
+diary off
